@@ -51,4 +51,19 @@ class RawUploadTest < Test::Unit::TestCase
       assert last_response.ok?
     end
   end
+  
+  context "path matcher" do
+    should "accept literal paths" do
+      rru = Rack::RawUpload.new nil, :path => '/resources.json'
+      assert rru.upload_path?('/resources.json')
+      assert ! rru.upload_path?('/resources.html')
+    end
+
+    should "accept paths with wildcards" do
+      rru = Rack::RawUpload.new nil, :path => '/resources.*'
+      assert rru.upload_path?('/resources.json')
+      assert rru.upload_path?('/resources.*')
+      assert ! rru.upload_path?('/resource.json')
+    end
+  end
 end

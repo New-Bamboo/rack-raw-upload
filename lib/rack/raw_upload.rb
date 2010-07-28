@@ -12,6 +12,10 @@ module Rack
       raw_file_post?(env) ? convert_and_pass_on(env) : @app.call(env)
     end
 
+    def upload_path?(path)
+      literal_path_match?(path) || wildcard_path_match?(path)
+    end
+
 
     private
 
@@ -43,8 +47,15 @@ module Rack
         env['CONTENT_TYPE'] == 'application/octet-stream'
     end
 
-    def upload_path?(path)
+    def literal_path_match?(path)
       path == @opts[:path]
+    end
+
+    def wildcard_path_match?(path)
+      upload_path = @opts[:path]
+      return false unless upload_path.include?('*')
+      regexp = '^' + upload_path.gsub(/\*/, '.*') + '$'
+      !! (Regexp.new(regexp) =~ path)
     end
   end
 end

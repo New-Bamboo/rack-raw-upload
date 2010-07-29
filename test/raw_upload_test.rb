@@ -53,6 +53,13 @@ class RawUploadTest < Test::Unit::TestCase
   end
   
   context "path matcher" do
+    should "accept any path by default" do
+      rru = Rack::RawUpload.new(nil)
+      assert rru.upload_path?('/')
+      assert rru.upload_path?('/resources.json')
+      assert rru.upload_path?('/resources/stuff.json')
+    end
+
     should "accept literal paths" do
       rru = Rack::RawUpload.new nil, :paths => '/resources.json'
       assert rru.upload_path?('/resources.json')

@@ -12,3 +12,7 @@ Rack::RawUpload expects that requests will:
 
 1. be POST requests
 2. set the mimetype `application/octet-stream`
+
+Optionally:
+
+* include a header `X-File-Name` specifying the name of the file

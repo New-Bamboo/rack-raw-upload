@@ -1,6 +1,6 @@
 # Rack Raw Upload middleware
 
-Rack::RawUpload converts files uploaded with mimetype `application/octect-stream` into normal form input, so Rack applications can read these as normal, rather than as raw input.
+Rack::RawUpload converts files uploaded with mimetype `application/octet-stream` into normal form input, so Rack applications can read these as normal, rather than as raw input.
 
 # Configuration
 
@@ -11,4 +11,4 @@ Rack::RawUpload converts files uploaded with mimetype `application/octect-stream
 Rack::RawUpload expects that requests will:
 
 1. be POST requests
-2. set the mimetype `application/octect-stream`
+2. set the mimetype `application/octet-stream`

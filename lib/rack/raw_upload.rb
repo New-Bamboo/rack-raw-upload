@@ -4,12 +4,7 @@ module Rack
     def initialize(app, opts = {})
       @app = app
       @paths = opts[:paths]
-      case @paths
-      when String
-        @paths = [@paths]
-      when nil
-        @paths = []
-      end
+      @paths = [@paths] if @paths.kind_of?(String)
     end
 
     def call(env)
@@ -17,7 +12,7 @@ module Rack
     end
 
     def upload_path?(request_path)
-      return true if @paths.empty?
+      return true if @paths.nil?
 
       @paths.any? do |candidate|
         literal_path_match?(request_path, candidate) || wildcard_path_match?(request_path, candidate)

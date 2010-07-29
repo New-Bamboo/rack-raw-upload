@@ -2,6 +2,7 @@ require 'rubygems'
 require 'rack/test'
 require 'shoulda'
 require 'rack/raw_upload'
+require 'json'
 
 class RawUploadTest < Test::Unit::TestCase
   include Rack::Test::Methods

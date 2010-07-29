@@ -1,5 +1,3 @@
-require 'json'
-
 module Rack
   class RawUpload
 
@@ -44,6 +42,7 @@ module Rack
       env['rack.request.form_hash']['file'] = fake_file
       env['rack.request.query_hash']['file'] = fake_file
       if query_params = env['HTTP_X_QUERY_PARAMS']
+        require 'json'
         params = JSON.parse(query_params)
         env['rack.request.form_hash'].merge!(params)
         env['rack.request.query_hash'].merge!(params)

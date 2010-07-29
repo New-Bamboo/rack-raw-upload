@@ -8,47 +8,57 @@ class RawUploadTest < Test::Unit::TestCase
 
   def app
     Rack::Builder.new do
-      use Rack::RawUpload, :paths => '/some/path'
+      use Rack::RawUpload
       run Proc.new { |env| [200, {'Content-Type' => 'text/html'}, ['success']] }
     end
   end
 
+  def upload(env = {})
+    @path = __FILE__
+    @filename = File.basename(@path)
+    @file = File.open(@path)
+    env = {
+      'REQUEST_METHOD' => 'POST',
+      'CONTENT_TYPE' => 'application/octet-stream',
+      'PATH_INFO' => '/some/path',
+      'HTTP_X_FILE_NAME' => @filename,
+      'rack.input' => @file,
+    }.merge(env)
+    request(env['PATH_INFO'], env)
+  end
+
   context "raw file upload" do
-    setup do
-      @path = __FILE__
-      @filename = File.basename(@path)
-      @file = File.open(@path)
-      query_params = {
-        :argument => 'value1',
-        'argument with spaces' => 'value 2'
-      }
-      env = {
-        'REQUEST_METHOD' => 'POST',
-        'CONTENT_TYPE' => 'application/octet-stream',
-        'HTTP_X_QUERY_PARAMS' => JSON.generate(query_params),
-        'PATH_INFO' => '/some/path',
-        'HTTP_X_FILE_NAME' => @filename,
-        'rack.input' => @file,
-      }
-      request(env['PATH_INFO'], env)
+    context "" do
+      setup do
+        upload
+      end
+
+      should "be transformed into a normal form upload" do
+        file = File.open(@path)
+        received = last_request.POST["file"]
+        received[:tempfile].open
+        assert_equal received[:tempfile].gets, file.gets
+        assert_equal received[:filename], @filename
+        assert_equal received[:type], "application/octet-stream"
+      end
+
+      should "succeed" do
+        assert last_response.ok?
+      end
     end
 
-    should "be transformed into a normal form upload" do
-      file = File.open(@path)
-      received = last_request.POST["file"]
-      received[:tempfile].open
-      assert_equal received[:tempfile].gets, file.gets
-      assert_equal received[:filename], @filename
-      assert_equal received[:type], "application/octet-stream"
-    end
+    context "with query parameters in a header" do
+      setup do
+        upload('HTTP_X_QUERY_PARAMS' => JSON.generate({
+          :argument => 'value1',
+          'argument with spaces' => 'value 2'
+        }))
+      end
 
-    should "convert any additional parameters from headers to arguments" do
-      assert_equal last_request.POST['argument'], 'value1'
-      assert_equal last_request.POST['argument with spaces'], 'value 2'
-    end
-  
-    should "succeed" do
-      assert last_response.ok?
+      should "convert these into arguments" do
+        assert_equal last_request.POST['argument'], 'value1'
+        assert_equal last_request.POST['argument with spaces'], 'value 2'
+      end
     end
   end
   

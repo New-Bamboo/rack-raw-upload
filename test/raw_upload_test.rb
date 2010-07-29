@@ -8,7 +8,7 @@ class RawUploadTest < Test::Unit::TestCase
 
   def app
     Rack::Builder.new do
-      use Rack::RawUpload, :path => '/some/path'
+      use Rack::RawUpload, :paths => '/some/path'
       run Proc.new { |env| [200, {'Content-Type' => 'text/html'}, ['success']] }
     end
   end
@@ -54,16 +54,23 @@ class RawUploadTest < Test::Unit::TestCase
   
   context "path matcher" do
     should "accept literal paths" do
-      rru = Rack::RawUpload.new nil, :path => '/resources.json'
+      rru = Rack::RawUpload.new nil, :paths => '/resources.json'
       assert rru.upload_path?('/resources.json')
       assert ! rru.upload_path?('/resources.html')
     end
 
     should "accept paths with wildcards" do
-      rru = Rack::RawUpload.new nil, :path => '/resources.*'
+      rru = Rack::RawUpload.new nil, :paths => '/resources.*'
       assert rru.upload_path?('/resources.json')
       assert rru.upload_path?('/resources.*')
       assert ! rru.upload_path?('/resource.json')
+    end
+    
+    should "accept several entries" do
+      rru = Rack::RawUpload.new nil, :paths => ['/resources.*', '/uploads']
+      assert rru.upload_path?('/uploads')
+      assert rru.upload_path?('/resources.*')
+      assert ! rru.upload_path?('/upload')
     end
   end
 end

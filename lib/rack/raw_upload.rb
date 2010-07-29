@@ -5,15 +5,18 @@ module Rack
 
     def initialize(app, opts = {})
       @app = app
-      @opts = opts
+      @paths = opts[:paths]
+      @paths = [@paths] if @paths.kind_of?(String)
     end
 
     def call(env)
       raw_file_post?(env) ? convert_and_pass_on(env) : @app.call(env)
     end
 
-    def upload_path?(path)
-      literal_path_match?(path) || wildcard_path_match?(path)
+    def upload_path?(request_path)
+      @paths.any? do |candidate|
+        literal_path_match?(request_path, candidate) || wildcard_path_match?(request_path, candidate)
+      end
     end
 
 
@@ -47,15 +50,14 @@ module Rack
         env['CONTENT_TYPE'] == 'application/octet-stream'
     end
 
-    def literal_path_match?(path)
-      path == @opts[:path]
+    def literal_path_match?(request_path, candidate)
+      candidate == request_path
     end
 
-    def wildcard_path_match?(path)
-      upload_path = @opts[:path]
-      return false unless upload_path.include?('*')
-      regexp = '^' + upload_path.gsub(/\*/, '.*') + '$'
-      !! (Regexp.new(regexp) =~ path)
+    def wildcard_path_match?(request_path, candidate)
+      return false unless candidate.include?('*')
+      regexp = '^' + candidate.gsub(/\*/, '.*') + '$'
+      !! (Regexp.new(regexp) =~ request_path)
     end
   end
 end

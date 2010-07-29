@@ -56,7 +56,7 @@ module Rack
 
     def wildcard_path_match?(request_path, candidate)
       return false unless candidate.include?('*')
-      regexp = '^' + candidate.gsub(/\*/, '.*') + '$'
+      regexp = '^' + candidate.gsub('.', '\.').gsub('*', '.*') + '$'
       !! (Regexp.new(regexp) =~ request_path)
     end
   end

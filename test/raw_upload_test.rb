@@ -64,6 +64,7 @@ class RawUploadTest < Test::Unit::TestCase
       assert rru.upload_path?('/resources.json')
       assert rru.upload_path?('/resources.*')
       assert ! rru.upload_path?('/resource.json')
+      assert ! rru.upload_path?('/resourcess.json')
     end
     
     should "accept several entries" do

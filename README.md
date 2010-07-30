@@ -40,4 +40,4 @@ When present, Rack::RawUpload will assume that the header ***`X-Query-Params`***
 
 A blog post on HTML5 uploads, which are raw uploads, and can be greatly simplified with this middleware:
 
-* http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads
+* [http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads](http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads)

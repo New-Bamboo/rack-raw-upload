@@ -14,15 +14,17 @@ class RawUploadTest < Test::Unit::TestCase
     end
   end
 
-  def upload(env = {})
+  def setup
     @path = __FILE__
     @filename = File.basename(@path)
     @file = File.open(@path)
+  end
+
+  def upload(env = {})
     env = {
       'REQUEST_METHOD' => 'POST',
       'CONTENT_TYPE' => 'application/octet-stream',
       'PATH_INFO' => '/some/path',
-      'HTTP_X_FILE_NAME' => @filename,
       'rack.input' => @file,
     }.merge(env)
     request(env['PATH_INFO'], env)
@@ -39,7 +41,6 @@ class RawUploadTest < Test::Unit::TestCase
         received = last_request.POST["file"]
         received[:tempfile].open
         assert_equal received[:tempfile].gets, file.gets
-        assert_equal received[:filename], @filename
         assert_equal received[:type], "application/octet-stream"
       end
 
@@ -48,7 +49,7 @@ class RawUploadTest < Test::Unit::TestCase
       end
     end
 
-    context "with query parameters in a header" do
+    context "with query parameters" do
       setup do
         upload('HTTP_X_QUERY_PARAMS' => JSON.generate({
           :argument => 'value1',
@@ -59,6 +60,16 @@ class RawUploadTest < Test::Unit::TestCase
       should "convert these into arguments" do
         assert_equal last_request.POST['argument'], 'value1'
         assert_equal last_request.POST['argument with spaces'], 'value 2'
+      end
+    end
+
+    context "with filename" do
+      setup do
+        upload('HTTP_X_FILE_NAME' => @filename)
+      end
+
+      should "be transformed into a normal form upload" do
+        assert_equal @filename, last_request.POST["file"][:filename]
       end
     end
   end

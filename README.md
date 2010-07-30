@@ -6,7 +6,7 @@ Rack::RawUpload converts files uploaded with mimetype `application/octet-stream`
 
     use Rack::RawUpload, :paths => ['/upload/path', '/alternative/path.*']
 
-# Assumtions
+# Assumptions
 
 Rack::RawUpload expects that requests will:
 

@@ -35,3 +35,9 @@ When present, Rack::RawUpload will assume that the header ***`X-File-Name`*** wi
 Again, the nature of raw uploads prevents us from sending additional parameters along with the file. As a workaround, you can specify there as a header too. They will be made available as normal parameters.
 
 When present, Rack::RawUpload will assume that the header ***`X-Query-Params`*** contains these additional parameters. The values are expected to be in the form of a **JSON** hash.
+
+## Additional info
+
+A blog post on HTML5 uploads, which are raw uploads, and can be greatly simplified with this middleware:
+
+* http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads

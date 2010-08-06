@@ -39,7 +39,6 @@ class RawUploadTest < Test::Unit::TestCase
       should "be transformed into a normal form upload" do
         file = File.open(@path)
         received = last_request.POST["file"]
-        received[:tempfile].open
         assert_equal received[:tempfile].gets, file.gets
         assert_equal received[:type], "application/octet-stream"
       end

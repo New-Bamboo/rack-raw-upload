@@ -29,7 +29,7 @@ module Rack
       tempfile.rewind
       fake_file = {
         :filename => env['HTTP_X_FILE_NAME'],
-        :type => 'application/octet-stream',
+        :type => env['CONTENT_TYPE'],
         :tempfile => tempfile,
       }
       env['rack.request.form_input'] = env['rack.input']
@@ -49,7 +49,7 @@ module Rack
     def raw_file_post?(env)
       upload_path?(env['PATH_INFO']) &&
         env['REQUEST_METHOD'] == 'POST' &&
-        env['CONTENT_TYPE'] == 'application/octet-stream'
+        content_type_of_raw_file?(env['CONTENT_TYPE'])
     end
 
     def literal_path_match?(request_path, candidate)
@@ -60,6 +60,10 @@ module Rack
       return false unless candidate.include?('*')
       regexp = '^' + candidate.gsub('.', '\.').gsub('*', '[^/]*') + '$'
       !! (Regexp.new(regexp) =~ request_path)
+    end
+    
+    def content_type_of_raw_file?(content_type)
+      ! %w{application/x-www-form-urlencoded multipart/form-data}.include?(content_type)
     end
   end
 end

@@ -31,21 +31,24 @@ class RawUploadTest < Test::Unit::TestCase
   end
 
   context "raw file upload" do
-    context "" do
-      setup do
-        upload
-      end
+    should "work with Content-Type 'application/octet-stream'" do
+      upload('CONTENT_TYPE' => 'application/octet-stream')
+      assert_file_uploaded_as 'application/octet-stream'
+    end
 
-      should "be transformed into a normal form upload" do
-        file = File.open(@path)
-        received = last_request.POST["file"]
-        assert_equal received[:tempfile].gets, file.gets
-        assert_equal received[:type], "application/octet-stream"
-      end
+    should "work with Content-Type 'image/jpeg'" do
+      upload('CONTENT_TYPE' => 'image/jpeg')
+      assert_file_uploaded_as 'image/jpeg'
+    end
 
-      should "succeed" do
-        assert last_response.ok?
-      end
+    should "not work with Content-Type 'application/x-www-form-urlencoded'" do
+      upload('CONTENT_TYPE' => 'application/x-www-form-urlencoded')
+      assert_successful_non_upload
+    end
+
+    should "not work with Content-Type 'multipart/form-data'" do
+      upload('CONTENT_TYPE' => 'multipart/form-data')
+      assert_successful_non_upload
     end
 
     context "with query parameters" do
@@ -102,5 +105,18 @@ class RawUploadTest < Test::Unit::TestCase
       assert rru.upload_path?('/resources.*')
       assert ! rru.upload_path?('/upload')
     end
+  end
+  
+  def assert_file_uploaded_as(file_type)
+    file = File.open(@path)
+    received = last_request.POST["file"]
+    assert_equal file.gets, received[:tempfile].gets
+    assert_equal file_type, received[:type]
+    assert last_response.ok?
+  end
+
+  def assert_successful_non_upload
+    assert ! last_request.POST.has_key?('file')
+    assert last_response.ok?
   end
 end

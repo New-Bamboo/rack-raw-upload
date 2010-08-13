@@ -4,6 +4,7 @@ module Rack
     def initialize(app, opts = {})
       @app = app
       @paths = opts[:paths]
+      @explicit = opts[:explicit]
       @paths = [@paths] if @paths.kind_of?(String)
     end
 
@@ -48,7 +49,8 @@ module Rack
 
     def kick_in?(env)
       env['HTTP_X_FILE_UPLOAD'] == 'true' ||
-        env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_post?(env)
+        ! @explicit && env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_post?(env) ||
+        env.has_key?('HTTP_X_FILE_UPLOAD') && env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_post?(env)
     end
 
     def raw_file_post?(env)

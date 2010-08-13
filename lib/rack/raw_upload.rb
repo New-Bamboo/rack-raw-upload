@@ -8,7 +8,7 @@ module Rack
     end
 
     def call(env)
-      raw_file_post?(env) ? convert_and_pass_on(env) : @app.call(env)
+      kick_in?(env) ? convert_and_pass_on(env) : @app.call(env)
     end
 
     def upload_path?(request_path)
@@ -44,6 +44,11 @@ module Rack
         env['rack.request.query_hash'].merge!(params)
       end
       @app.call(env)
+    end
+
+    def kick_in?(env)
+      env['HTTP_X_FILE_UPLOAD'] == 'true' ||
+        env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_post?(env)
     end
 
     def raw_file_post?(env)

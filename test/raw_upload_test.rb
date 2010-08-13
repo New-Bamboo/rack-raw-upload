@@ -50,6 +50,28 @@ class RawUploadTest < Test::Unit::TestCase
       upload('CONTENT_TYPE' => 'multipart/form-data')
       assert_successful_non_upload
     end
+    
+    should "be forced to perform a file upload if forced by the X-File-Upload header" do
+      upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'true')
+      assert_file_uploaded_as 'multipart/form-data'
+    end
+
+    should "not perform a file upload if disallowed by the X-File-Upload header" do
+      upload('CONTENT_TYPE' => 'image/jpeg', 'HTTP_X_FILE_UPLOAD' => 'false')
+      assert_successful_non_upload
+    end
+
+    context "with X-File-Upload is set to 'smart'" do
+      should "perform a file upload if appropriate " do
+        upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        assert_successful_non_upload
+      end
+
+      should "not perform a file upload if not appropriate " do
+        upload('CONTENT_TYPE' => 'image/jpeg', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        assert_file_uploaded_as 'image/jpeg'
+      end
+    end
 
     context "with query parameters" do
       setup do

@@ -27,7 +27,7 @@ If you want to limit the conversion to a few known paths, do:
 
     use Rack::RawUpload, :paths => ['/upload/path', '/alternative/path.*']
 
-You can also make it so that the conversion only happens when explicitly required by the client using a header. This would be `X-File-Upload: yes` to make the conversion regardless of the content type. A value of `X-File-Upload: smart` would ask for the normal detection to be performed. For this, use the following setting:
+You can also make it so that the conversion only happens when explicitly required by the client using a header. This would be `X-File-Upload: true` to make the conversion regardless of the content type. A value of `X-File-Upload: smart` would ask for the normal detection to be performed. For this, use the following setting:
 
     use Rack::RawUpload, :explicit => true
 

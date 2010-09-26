@@ -24,6 +24,7 @@ module Rack
 
     def convert_and_pass_on(env)
       tempfile = Tempfile.new('raw-upload.')
+      tempfile = open(tempfile.path, "r+:BINARY")
       tempfile << env['rack.input'].read
       tempfile.flush
       tempfile.rewind

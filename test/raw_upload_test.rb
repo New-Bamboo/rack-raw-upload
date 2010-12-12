@@ -8,13 +8,15 @@ class RawUploadTest < Test::Unit::TestCase
   include Rack::Test::Methods
 
   def app
+    opts = @middleware_opts
     Rack::Builder.new do
-      use Rack::RawUpload
+      use Rack::RawUpload, opts
       run Proc.new { |env| [200, {'Content-Type' => 'text/html'}, ['success']] }
     end
   end
 
   def setup
+    @middleware_opts = {}
     @path = __FILE__
     @filename = File.basename(@path)
     @file = File.open(@path)
@@ -31,20 +33,71 @@ class RawUploadTest < Test::Unit::TestCase
   end
 
   context "raw file upload" do
-    context "" do
+    should "work with Content-Type 'application/octet-stream'" do
+      upload('CONTENT_TYPE' => 'application/octet-stream')
+      assert_file_uploaded_as 'application/octet-stream'
+    end
+
+    should "work with Content-Type 'image/jpeg'" do
+      upload('CONTENT_TYPE' => 'image/jpeg')
+      assert_file_uploaded_as 'image/jpeg'
+    end
+
+    should "not work with Content-Type 'application/x-www-form-urlencoded'" do
+      upload('CONTENT_TYPE' => 'application/x-www-form-urlencoded')
+      assert_successful_non_upload
+    end
+
+    should "not work with Content-Type 'multipart/form-data'" do
+      upload('CONTENT_TYPE' => 'multipart/form-data')
+      assert_successful_non_upload
+    end
+    
+    should "be forced to perform a file upload if `X-File-Upload: true`" do
+      upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'true')
+      assert_file_uploaded_as 'multipart/form-data'
+    end
+
+    should "not perform a file upload if `X-File-Upload: false`" do
+      upload('CONTENT_TYPE' => 'image/jpeg', 'HTTP_X_FILE_UPLOAD' => 'false')
+      assert_successful_non_upload
+    end
+
+    context "with X-File-Upload: smart" do
+      should "perform a file upload if appropriate" do
+        upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        assert_successful_non_upload
+      end
+
+      should "not perform a file upload if not appropriate" do
+        upload('CONTENT_TYPE' => 'image/jpeg', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        assert_file_uploaded_as 'image/jpeg'
+      end
+    end
+
+    context "with :explicit => true" do
       setup do
-        upload
+        @middleware_opts = { :explicit => true }
       end
 
-      should "be transformed into a normal form upload" do
-        file = File.open(@path)
-        received = last_request.POST["file"]
-        assert_equal received[:tempfile].gets, file.gets
-        assert_equal received[:type], "application/octet-stream"
+      should "not be triggered by an appropriate Content-Type" do
+        upload('CONTENT_TYPE' => 'image/jpeg')
+        assert_successful_non_upload
       end
 
-      should "succeed" do
-        assert last_response.ok?
+      should "be triggered by `X-File-Upload: true`" do
+        upload('CONTENT_TYPE' => 'image/jpeg', 'HTTP_X_FILE_UPLOAD' => 'true')
+        assert_file_uploaded_as 'image/jpeg'
+      end
+
+      should "kick in when `X-File-Upload: smart` and the request is an upload" do
+        upload('CONTENT_TYPE' => 'image/jpeg', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        assert_file_uploaded_as 'image/jpeg'
+      end
+
+      should "stay put `X-File-Upload: smart` and the request is not an upload" do
+        upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        assert_successful_non_upload
       end
     end
 
@@ -102,5 +155,18 @@ class RawUploadTest < Test::Unit::TestCase
       assert rru.upload_path?('/resources.*')
       assert ! rru.upload_path?('/upload')
     end
+  end
+  
+  def assert_file_uploaded_as(file_type)
+    file = File.open(@path)
+    received = last_request.POST["file"]
+    assert_equal file.gets, received[:tempfile].gets
+    assert_equal file_type, received[:type]
+    assert last_response.ok?
+  end
+
+  def assert_successful_non_upload
+    assert ! last_request.POST.has_key?('file')
+    assert last_response.ok?
   end
 end

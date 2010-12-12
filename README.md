@@ -1,7 +1,13 @@
 # Rack Raw Upload middleware
 
-Rack::RawUpload converts files uploaded with mimetype `application/octet-stream` into normal form input, so Rack applications can read these as normal, rather than as raw input.
+Rack::RawUpload converts raw file uploads into normal form input, so Rack applications can read these as normal (using `params` for example), rather than from `env['rack.input']` or similar.
 
+Rack::RawUpload know that a request is such an upload when the mimetype **is not** one of the following:
+
+* application/x-www-form-urlencoded
+* multipart/form-data
+
+Additionally, it can be told explicitly to perform the conversion, using the header `X-File-Upload`. See below for details.
 
 ## Assumptions
 
@@ -20,6 +26,10 @@ The simpler case:
 If you want to limit the conversion to a few known paths, do:
 
     use Rack::RawUpload, :paths => ['/upload/path', '/alternative/path.*']
+
+You can also make it so that the conversion only happens when explicitly required by the client using a header. This would be `X-File-Upload: true` to make the conversion regardless of the content type. A value of `X-File-Upload: smart` would ask for the normal detection to be performed. For this, use the following setting:
+
+    use Rack::RawUpload, :explicit => true
 
 
 ## More options

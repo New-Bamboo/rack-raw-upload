@@ -4,11 +4,12 @@ module Rack
     def initialize(app, opts = {})
       @app = app
       @paths = opts[:paths]
+      @explicit = opts[:explicit]
       @paths = [@paths] if @paths.kind_of?(String)
     end
 
     def call(env)
-      raw_file_post?(env) ? convert_and_pass_on(env) : @app.call(env)
+      kick_in?(env) ? convert_and_pass_on(env) : @app.call(env)
     end
 
     def upload_path?(request_path)
@@ -30,7 +31,7 @@ module Rack
       tempfile.rewind
       fake_file = {
         :filename => env['HTTP_X_FILE_NAME'],
-        :type => 'application/octet-stream',
+        :type => env['CONTENT_TYPE'],
         :tempfile => tempfile,
       }
       env['rack.request.form_input'] = env['rack.input']
@@ -47,10 +48,16 @@ module Rack
       @app.call(env)
     end
 
+    def kick_in?(env)
+      env['HTTP_X_FILE_UPLOAD'] == 'true' ||
+        ! @explicit && env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_post?(env) ||
+        env.has_key?('HTTP_X_FILE_UPLOAD') && env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_post?(env)
+    end
+
     def raw_file_post?(env)
       upload_path?(env['PATH_INFO']) &&
         env['REQUEST_METHOD'] == 'POST' &&
-        env['CONTENT_TYPE'] == 'application/octet-stream'
+        content_type_of_raw_file?(env['CONTENT_TYPE'])
     end
 
     def literal_path_match?(request_path, candidate)
@@ -61,6 +68,10 @@ module Rack
       return false unless candidate.include?('*')
       regexp = '^' + candidate.gsub('.', '\.').gsub('*', '[^/]*') + '$'
       !! (Regexp.new(regexp) =~ request_path)
+    end
+    
+    def content_type_of_raw_file?(content_type)
+      ! %w{application/x-www-form-urlencoded multipart/form-data}.include?(content_type)
     end
   end
 end

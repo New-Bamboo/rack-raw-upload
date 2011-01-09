@@ -101,6 +101,19 @@ class RawUploadTest < Test::Unit::TestCase
       end
     end
 
+    context "with a given :tmpdir" do
+      setup do
+        @tmp_path = File.join(Dir::tmpdir, 'rack-raw-upload/some-dir')
+        FileUtils.mkdir_p(@tmp_path)
+        @middleware_opts = { :tmpdir => @tmp_path }
+      end
+
+      should "use it as temporary file store" do
+        upload
+        assert Dir.entries(@tmp_path).any?{|node| node =~ /raw-upload/ }
+      end
+    end
+
     context "with query parameters" do
       setup do
         upload('HTTP_X_QUERY_PARAMS' => JSON.generate({

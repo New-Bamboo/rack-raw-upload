@@ -5,6 +5,7 @@ module Rack
       @app = app
       @paths = opts[:paths]
       @explicit = opts[:explicit]
+      @tmpdir = opts[:tmpdir] || Dir::tmpdir
       @paths = [@paths] if @paths.kind_of?(String)
     end
 
@@ -24,7 +25,7 @@ module Rack
     private
 
     def convert_and_pass_on(env)
-      tempfile = Tempfile.new('raw-upload.')
+      tempfile = Tempfile.new('raw-upload.', @tmpdir)
       tempfile = open(tempfile.path, "r+:BINARY")
       tempfile << env['rack.input'].read
       tempfile.flush

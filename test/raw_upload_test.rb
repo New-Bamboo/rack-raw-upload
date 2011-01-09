@@ -95,7 +95,7 @@ class RawUploadTest < Test::Unit::TestCase
         assert_file_uploaded_as 'image/jpeg'
       end
 
-      should "stay put `X-File-Upload: smart` and the request is not an upload" do
+      should "stay put when `X-File-Upload: smart` and the request is not an upload" do
         upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
         assert_successful_non_upload
       end

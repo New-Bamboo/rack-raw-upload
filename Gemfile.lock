@@ -1,0 +1,18 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    json (1.4.6)
+    rack (1.2.1)
+    rack-test (0.5.6)
+      rack (>= 1.0)
+    rake (0.8.7)
+    shoulda (2.11.3)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  json
+  rack-test
+  rake
+  shoulda

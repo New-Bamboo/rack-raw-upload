@@ -1,6 +1,8 @@
 module Rack
   class RawUpload
 
+    VERSION = '0.1.0'
+
     def initialize(app, opts = {})
       @app = app
       @paths = opts[:paths]

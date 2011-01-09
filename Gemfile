@@ -1,6 +1,9 @@
 source :rubygems
 
 gem 'json'
-gem 'jeweler'
-gem 'shoulda'
-gem 'rack-test'
+
+group :development, :test do
+  gem 'rake'
+  gem 'rack-test'
+  gem 'shoulda'
+end

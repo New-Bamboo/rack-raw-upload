@@ -1,7 +1,7 @@
 module Rack
   class RawUpload
 
-    VERSION = '0.1.0'
+    VERSION = '0.1.1'
 
     def initialize(app, opts = {})
       @app = app

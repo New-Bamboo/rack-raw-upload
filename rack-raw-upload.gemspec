@@ -1,5 +1,3 @@
-require 'rake/testtask'
-
 lib     = File.expand_path("../lib/rack/raw_upload.rb", __FILE__)
 version = File.read(lib)[/^\s*VERSION\s*=\s*(['"])(\d\.\d\.\d+)\1/, 2] #'# gedit messing with highlighting...
 

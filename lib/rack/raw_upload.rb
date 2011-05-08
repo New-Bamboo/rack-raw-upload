@@ -28,7 +28,12 @@ module Rack
 
     def convert_and_pass_on(env)
       tempfile = Tempfile.new('raw-upload.', @tmpdir)
-      tempfile = open(tempfile.path, "r+:BINARY")
+      if (RUBY_VERSION.split('.').map{|e| e.to_i} <=> [1, 9]) > 0
+        # Not sure of what's going on, or how to test this.
+        # This seems to be needed in 1.9, but people report
+        # problems if done in 1.8.7
+        tempfile = open(tempfile.path, "r+:BINARY")
+      end
       tempfile << env['rack.input'].read
       tempfile.flush
       tempfile.rewind

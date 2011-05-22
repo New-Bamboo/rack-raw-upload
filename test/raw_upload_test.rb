@@ -63,6 +63,13 @@ class RawUploadTest < Test::Unit::TestCase
       assert_successful_non_upload
     end
 
+    should "be compatible to rails 1.8.7 and tempfile must exist after garbage collection" do
+      upload('CONTENT_TYPE' => 'application/octet-stream')
+      received = last_request.POST["file"]
+      GC.start
+      assert File.exists?(received[:tempfile].path)
+    end
+
     context "with X-File-Upload: smart" do
       should "perform a file upload if appropriate" do
         upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')

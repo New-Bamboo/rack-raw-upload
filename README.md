@@ -19,25 +19,31 @@ Rack::RawUpload expects that requests will:
 
 ## Configuration
 
-The simpler case:
+### Bog-standard Rack app
 
+The simpler case. Add these lines in your `config.ru`, where appropriate:
+
+    require 'rack/raw_upload'
     use Rack::RawUpload
 
 If you want to limit the conversion to a few known paths, do:
 
+    require 'rack/raw_upload'
     use Rack::RawUpload, :paths => ['/upload/path', '/alternative/path.*']
 
 You can also make it so that the conversion only happens when explicitly required by the client using a header. This would be `X-File-Upload: true` to make the conversion regardless of the content type. A value of `X-File-Upload: smart` would ask for the normal detection to be performed. For this, use the following setting:
 
     use Rack::RawUpload, :explicit => true
 
-Or if you are using rails, add this to your Gemfile
+### Ruby on Rails
+
+Add this to your Gemfile
 
     gem 'rack-raw-upload', :require => 'rack/raw_upload'
 
 and then add the middleware in application.rb
 
-    config.middleware.insert 0, 'Rack::RawUpload'
+    config.middleware.use 'Rack::RawUpload'
 
 ## More options
 

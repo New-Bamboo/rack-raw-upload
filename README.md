@@ -31,6 +31,13 @@ You can also make it so that the conversion only happens when explicitly require
 
     use Rack::RawUpload, :explicit => true
 
+Or if you are using rails, add this to your Gemfile
+
+    gem 'rack-raw-upload', :require => 'rack/raw_upload'
+
+and then add the middleware in application.rb
+
+    config.middleware.insert 0, 'Rack::RawUpload'
 
 ## More options
 

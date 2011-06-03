@@ -64,3 +64,5 @@ When present, Rack::RawUpload will assume that the header ***`X-Query-Params`***
 A blog post on HTML5 uploads, which are raw uploads, and can be greatly simplified with this middleware:
 
 * [http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads](http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads)
+
+This middleware should work with Ruby 1.8.7, 1.9.2, REE, Rubinius and JRuby. Tests for all these platforms are run on the wonderful [Travis-CI](http://travis-ci.org/) regularly, and the current status of these is: [![Build Status](http://travis-ci.org/newbamboo/rack-raw-upload.png)](http://travis-ci.org/newbamboo/rack-raw-upload)

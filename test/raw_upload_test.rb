@@ -52,6 +52,13 @@ class RawUploadTest < Test::Unit::TestCase
       upload('CONTENT_TYPE' => 'multipart/form-data')
       assert_successful_non_upload
     end
+
+    # "stuff" should be something like "boundary=----WebKitFormBoundaryeKPeU4p65YgercgO",
+    # but if I do that here, Rack tries to be clever and the test breaks
+    should "not work with Content-Type 'multipart/form-data; stuff'" do
+      upload('CONTENT_TYPE' => 'multipart/form-data; stuff')
+      assert_successful_non_upload
+    end
     
     should "be forced to perform a file upload if `X-File-Upload: true`" do
       upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'true')

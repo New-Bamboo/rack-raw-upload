@@ -82,7 +82,12 @@ module Rack
     end
     
     def content_type_of_raw_file?(content_type)
-      ! %w{application/x-www-form-urlencoded multipart/form-data}.include?(content_type)
+      case content_type
+      when %r{^application/x-www-form-urlencoded}, %r{^multipart/form-data}
+        false
+      else
+        true
+      end
     end
   end
 end

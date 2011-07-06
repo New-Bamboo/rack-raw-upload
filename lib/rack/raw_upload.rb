@@ -61,13 +61,13 @@ module Rack
 
     def kick_in?(env)
       env['HTTP_X_FILE_UPLOAD'] == 'true' ||
-        ! @explicit && env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_post?(env) ||
-        env.has_key?('HTTP_X_FILE_UPLOAD') && env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_post?(env)
+        ! @explicit && env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_upload?(env) ||
+        env.has_key?('HTTP_X_FILE_UPLOAD') && env['HTTP_X_FILE_UPLOAD'] != 'false' && raw_file_upload?(env)
     end
 
-    def raw_file_post?(env)
+    def raw_file_upload?(env)
       upload_path?(env['PATH_INFO']) &&
-        env['REQUEST_METHOD'] == 'POST' &&
+        %{POST PUT}.include?(env['REQUEST_METHOD']) &&
         content_type_of_raw_file?(env['CONTENT_TYPE'])
     end
 

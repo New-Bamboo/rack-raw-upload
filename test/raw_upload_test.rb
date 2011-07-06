@@ -33,6 +33,11 @@ class RawUploadTest < Test::Unit::TestCase
   end
 
   context "raw file upload" do
+    should "work with PUT requests" do
+      upload('REQUEST_METHOD' => 'PUT')
+      assert_file_uploaded
+    end
+
     should "work with Content-Type 'application/octet-stream'" do
       upload('CONTENT_TYPE' => 'application/octet-stream')
       assert_file_uploaded_as 'application/octet-stream'
@@ -182,6 +187,13 @@ class RawUploadTest < Test::Unit::TestCase
       assert rru.upload_path?('/resources.*')
       assert ! rru.upload_path?('/upload')
     end
+  end
+
+  def assert_file_uploaded
+    file = File.open(@path)
+    received = last_request.POST["file"]
+    assert_equal file.gets, received[:tempfile].gets
+    assert last_response.ok?
   end
   
   def assert_file_uploaded_as(file_type)

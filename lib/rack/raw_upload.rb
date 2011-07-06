@@ -3,7 +3,7 @@ require 'tmpdir' # Needed in 1.8.7 to access Dir::tmpdir
 module Rack
   class RawUpload
 
-    VERSION = '1.0.3'
+    VERSION = '1.0.4'
 
     def initialize(app, opts = {})
       @app = app

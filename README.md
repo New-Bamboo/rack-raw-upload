@@ -13,7 +13,7 @@ Additionally, it can be told explicitly to perform the conversion, using the hea
 
 Rack::RawUpload expects that requests will:
 
-1. be POST requests
+1. be POST or PUT requests
 2. set the mimetype `application/octet-stream`
 
 

@@ -35,7 +35,9 @@ module Rack
         # the garbage collector will unlink this file.
         # in this case, only the path to the 'original' tempfile is used
         # and the physical file will be deleted, if the gc runs.
-        tempfile = open(tempfile.path, "r+:BINARY")
+        tempfile2 = relink_file(tempfile)
+        tempfile.close
+        tempfile = tempfile2
       end
       tempfile << env['rack.input'].read
       tempfile.flush
@@ -88,6 +90,19 @@ module Rack
       else
         true
       end
+    end
+
+    def relink_file(file)
+      new_name = file.path + random_string
+      ::File.link(file.path, new_name)
+      ::File.open(new_name, "r+:BINARY")
+    rescue SystemCallError
+      # The randomly chosen file name was taken. Try again.
+      retry
+    end
+
+    def random_string
+      (0...8).map{65.+(rand(25)).chr}.join
     end
   end
 end

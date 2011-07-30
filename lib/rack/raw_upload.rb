@@ -95,7 +95,9 @@ module Rack
     def relink_file(file)
       new_name = file.path + random_string
       ::File.link(file.path, new_name)
-      ::File.open(new_name, "r+:BINARY")
+      ret = ::File.open(new_name, "r+")
+      ret.binmode
+      ret
     rescue SystemCallError
       # The randomly chosen file name was taken. Try again.
       retry

@@ -3,6 +3,7 @@ require 'rack/test'
 require 'shoulda'
 require 'rack-raw-upload'
 require 'json'
+require 'digest'
 
 class RawUploadTest < Test::Unit::TestCase
   include Rack::Test::Methods
@@ -17,17 +18,31 @@ class RawUploadTest < Test::Unit::TestCase
 
   def setup
     @middleware_opts = {}
-    @path = __FILE__
+    @path = File.join(File.dirname(__FILE__), %w{data me-in-shanghai.jpg})
     @filename = File.basename(@path)
     @file = File.open(@path)
   end
 
   def upload(env = {})
     env = {
-      'REQUEST_METHOD' => 'POST',
       'CONTENT_TYPE' => 'application/octet-stream',
+      'rack.input' => @file
+    }.merge(env)
+    do_request(env)
+  end
+
+  def post(env = {})
+    env = {
+      'CONTENT_TYPE' => 'multipart/form-data',
+      'rack.input' => StringIO.new('things=stuff')
+    }.merge(env)
+    do_request(env)
+  end
+
+  def do_request(env = {})
+    env = {
+      'REQUEST_METHOD' => 'POST',
       'PATH_INFO' => '/some/path',
-      'rack.input' => @file,
     }.merge(env)
     request(env['PATH_INFO'], env)
   end
@@ -49,19 +64,19 @@ class RawUploadTest < Test::Unit::TestCase
     end
 
     should "not work with Content-Type 'application/x-www-form-urlencoded'" do
-      upload('CONTENT_TYPE' => 'application/x-www-form-urlencoded')
+      post('CONTENT_TYPE' => 'application/x-www-form-urlencoded')
       assert_successful_non_upload
     end
 
     should "not work with Content-Type 'multipart/form-data'" do
-      upload('CONTENT_TYPE' => 'multipart/form-data')
+      post('CONTENT_TYPE' => 'multipart/form-data')
       assert_successful_non_upload
     end
 
     # "stuff" should be something like "boundary=----WebKitFormBoundaryeKPeU4p65YgercgO",
     # but if I do that here, Rack tries to be clever and the test breaks
     should "not work with Content-Type 'multipart/form-data; stuff'" do
-      upload('CONTENT_TYPE' => 'multipart/form-data; stuff')
+      post('CONTENT_TYPE' => 'multipart/form-data; stuff')
       assert_successful_non_upload
     end
     
@@ -84,7 +99,7 @@ class RawUploadTest < Test::Unit::TestCase
 
     context "with X-File-Upload: smart" do
       should "perform a file upload if appropriate" do
-        upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        post('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
         assert_successful_non_upload
       end
 
@@ -115,7 +130,7 @@ class RawUploadTest < Test::Unit::TestCase
       end
 
       should "stay put when `X-File-Upload: smart` and the request is not an upload" do
-        upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        post('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
         assert_successful_non_upload
       end
     end
@@ -192,14 +207,14 @@ class RawUploadTest < Test::Unit::TestCase
   def assert_file_uploaded
     file = File.open(@path)
     received = last_request.POST["file"]
-    assert_equal file.gets, received[:tempfile].gets
+    assert_files_equal file, received[:tempfile]
     assert last_response.ok?
   end
   
   def assert_file_uploaded_as(file_type)
     file = File.open(@path)
     received = last_request.POST["file"]
-    assert_equal file.gets, received[:tempfile].gets
+    assert_files_equal file, received[:tempfile]
     assert_equal file_type, received[:type]
     assert last_response.ok?
   end
@@ -207,5 +222,11 @@ class RawUploadTest < Test::Unit::TestCase
   def assert_successful_non_upload
     assert ! last_request.POST.has_key?('file')
     assert last_response.ok?
+  end
+
+  def assert_files_equal(f1, f2)
+    f1.seek(0)
+    f2.seek(0)
+    assert_equal Digest::MD5.hexdigest(f1.read), Digest::MD5.hexdigest(f2.read)
   end
 end

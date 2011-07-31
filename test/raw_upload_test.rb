@@ -54,7 +54,7 @@ class RawUploadTest < Test::Unit::TestCase
     end
 
     should "work with Content-Type 'application/octet-stream'" do
-      upload('CONTENT_TYPE' => 'application/octet-stream')
+      upload
       assert_file_uploaded_as 'application/octet-stream'
     end
 
@@ -69,7 +69,7 @@ class RawUploadTest < Test::Unit::TestCase
     end
 
     should "not work with Content-Type 'multipart/form-data'" do
-      post('CONTENT_TYPE' => 'multipart/form-data')
+      post
       assert_successful_non_upload
     end
 
@@ -91,7 +91,7 @@ class RawUploadTest < Test::Unit::TestCase
     end
 
     should "ensure the uploaded file exists after garbage collection (Ruby 1.9)" do
-      upload('CONTENT_TYPE' => 'application/octet-stream')
+      upload
       received = last_request.POST["file"]
       GC.start
       assert File.exists?(received[:tempfile].path)
@@ -99,7 +99,7 @@ class RawUploadTest < Test::Unit::TestCase
 
     context "with X-File-Upload: smart" do
       should "perform a file upload if appropriate" do
-        post('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        post('HTTP_X_FILE_UPLOAD' => 'smart')
         assert_successful_non_upload
       end
 
@@ -130,7 +130,7 @@ class RawUploadTest < Test::Unit::TestCase
       end
 
       should "stay put when `X-File-Upload: smart` and the request is not an upload" do
-        post('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'smart')
+        post('HTTP_X_FILE_UPLOAD' => 'smart')
         assert_successful_non_upload
       end
     end

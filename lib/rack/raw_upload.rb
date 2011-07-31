@@ -29,16 +29,7 @@ module Rack
     private
 
     def convert_and_pass_on(env)
-      tempfile = Tempfile.new('raw-upload.', @tmpdir)
-      if (RUBY_VERSION.split('.').map{|e| e.to_i} <=> [1, 9]) > 0
-        # 1.9: if the GC runs, it may unlink the tempfile.
-        # To avoid this, I create another version of it
-        # (a hard link to the same file). If the original
-        # is unlinked, we'll still have this other link.
-        tempfile2 = relink_file(tempfile)
-        tempfile.close
-        tempfile = tempfile2
-      end
+      tempfile = create_tempfile
       tempfile << env['rack.input'].read
       tempfile.flush
       tempfile.rewind
@@ -90,6 +81,18 @@ module Rack
       else
         true
       end
+    end
+
+    def create_tempfile
+      tempfile = Tempfile.new('raw-upload.', @tmpdir)
+
+      # If the GC runs, it may unlink the tempfile.
+      # To avoid this, I create another version of it
+      # (a hard link to the same file). If the original
+      # is unlinked, we'll still have this other link.
+      ret = relink_file(tempfile)
+      tempfile.close
+      ret
     end
 
     def relink_file(file)

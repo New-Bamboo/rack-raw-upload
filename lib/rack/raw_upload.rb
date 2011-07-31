@@ -31,10 +31,10 @@ module Rack
     def convert_and_pass_on(env)
       tempfile = Tempfile.new('raw-upload.', @tmpdir)
       if (RUBY_VERSION.split('.').map{|e| e.to_i} <=> [1, 9]) > 0
-        # 1.8.7: if the 'original' tempfile has no open file-handler,
-        # the garbage collector will unlink this file.
-        # in this case, only the path to the 'original' tempfile is used
-        # and the physical file will be deleted, if the gc runs.
+        # 1.9: if the GC runs, it may unlink the tempfile.
+        # To avoid this, I create another version of it
+        # (a hard link to the same file). If the original
+        # is unlinked, we'll still have this other link.
         tempfile2 = relink_file(tempfile)
         tempfile.close
         tempfile = tempfile2

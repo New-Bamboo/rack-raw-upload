@@ -90,7 +90,7 @@ class RawUploadTest < Test::Unit::TestCase
       assert_successful_non_upload
     end
 
-    should "be compatible to rails 1.8.7 and tempfile must exist after garbage collection" do
+    should "ensure the uploaded file exists after garbage collection (Ruby 1.9)" do
       upload('CONTENT_TYPE' => 'application/octet-stream')
       received = last_request.POST["file"]
       GC.start

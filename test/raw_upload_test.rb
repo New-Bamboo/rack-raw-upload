@@ -79,6 +79,14 @@ class RawUploadTest < Test::Unit::TestCase
       post('CONTENT_TYPE' => 'multipart/form-data; stuff')
       assert_successful_non_upload
     end
+
+    should "work when the input is a Tempfile" do
+      tempfile = Tempfile.new('rack-raw-upload-test-')
+      tempfile << @file.read
+      tempfile.rewind
+      upload('rack.input' => tempfile)
+      assert_file_uploaded
+    end
     
     should "be forced to perform a file upload if `X-File-Upload: true`" do
       upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'true')
@@ -206,7 +214,7 @@ class RawUploadTest < Test::Unit::TestCase
 
   def assert_file_uploaded
     file = File.open(@path)
-    received = last_request.POST["file"]
+    assert received = last_request.POST["file"], "No file received"
     assert_files_equal file, received[:tempfile]
     assert last_response.ok?
   end
@@ -225,8 +233,8 @@ class RawUploadTest < Test::Unit::TestCase
   end
 
   def assert_files_equal(f1, f2)
-    f1.seek(0)
-    f2.seek(0)
-    assert_equal Digest::MD5.hexdigest(f1.read), Digest::MD5.hexdigest(f2.read)
+    expected = Digest::MD5.hexdigest(IO.read(f1.path))
+    actual   = Digest::MD5.hexdigest(IO.read(f2.path))
+    assert_equal expected, actual
   end
 end

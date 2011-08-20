@@ -29,10 +29,15 @@ module Rack
     private
 
     def convert_and_pass_on(env)
-      tempfile = create_tempfile
-      tempfile << env['rack.input'].read
-      tempfile.flush
-      tempfile.rewind
+      if env['rack.input'].kind_of?(Tempfile)
+        env['rack.input'].extend(EqlFix)
+        tempfile = env['rack.input']
+      else
+        tempfile = create_tempfile
+        tempfile << env['rack.input'].read
+        tempfile.flush
+        tempfile.rewind
+      end
       fake_file = {
         :filename => env['HTTP_X_FILE_NAME'],
         :type => env['CONTENT_TYPE'],
@@ -110,4 +115,15 @@ module Rack
       (0...8).map{65.+(rand(25)).chr}.join
     end
   end
+
+
+  module EqlFix
+    def eql_with_fix?(o)
+      self.object_id.eql?(o.object_id) || self.eql_without_fix?(o)
+    end
+
+    alias_method :eql_without_fix?, :eql?
+    alias_method :eql?, :eql_with_fix?
+  end
+
 end

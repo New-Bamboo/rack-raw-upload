@@ -33,6 +33,8 @@ GEM
     arel (2.2.1)
     bcrypt-ruby (3.0.1)
     builder (3.0.0)
+    carrierwave (0.5.7)
+      activesupport (~> 3.0)
     erubis (2.7.0)
     hike (1.2.1)
     i18n (0.6.0)
@@ -49,6 +51,8 @@ GEM
       rack (>= 0.4)
     rack-mount (0.8.3)
       rack (>= 1.0.0)
+    rack-raw-upload (1.0.7)
+      json
     rack-ssl (1.3.2)
       rack
     rack-test (0.6.1)
@@ -86,6 +90,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  carrierwave
   json
+  rack-raw-upload
   rails (= 3.1.0)
   sqlite3

@@ -30,9 +30,11 @@ module Rack
 
     def convert_and_pass_on(env)
       if env['rack.input'].kind_of?(Tempfile)
+        puts 'EqlFix'
         env['rack.input'].extend(EqlFix)
         tempfile = env['rack.input']
       else
+        puts 'NO EqlFix'
         tempfile = create_tempfile
         tempfile << env['rack.input'].read
         tempfile.flush
@@ -78,7 +80,7 @@ module Rack
       regexp = '^' + candidate.gsub('.', '\.').gsub('*', '[^/]*') + '$'
       !! (Regexp.new(regexp) =~ request_path)
     end
-    
+
     def content_type_of_raw_file?(content_type)
       case content_type
       when %r{^application/x-www-form-urlencoded}, %r{^multipart/form-data}
@@ -104,6 +106,8 @@ module Rack
       new_name = file.path + random_string
       ::File.link(file.path, new_name)
       ret = ::File.open(new_name, "r+")
+require 'pp'
+pp ret.methods.sort
       ret.binmode
       ret
     rescue SystemCallError

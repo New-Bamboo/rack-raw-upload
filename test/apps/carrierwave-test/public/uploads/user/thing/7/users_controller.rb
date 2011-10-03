@@ -6,7 +6,7 @@ class UsersController < ApplicationController
 
   def create
     u = User.new
-    u.thing = params[:file]
+    u.thing = File.open(__FILE__)
     u.save!
     render :text => %{<a href="#{u.thing.url}">#{u.thing.url}</a>}
   rescue => e

@@ -33,7 +33,7 @@ module Rack
         env['rack.input'].extend(EqlFix)
         tempfile = env['rack.input']
       else
-        tempfile = create_tempfile
+        tempfile = Tempfile.new('raw-upload.', @tmpdir)
         tempfile << env['rack.input'].read
         tempfile.flush
         tempfile.rewind
@@ -78,7 +78,7 @@ module Rack
       regexp = '^' + candidate.gsub('.', '\.').gsub('*', '[^/]*') + '$'
       !! (Regexp.new(regexp) =~ request_path)
     end
-    
+
     def content_type_of_raw_file?(content_type)
       case content_type
       when %r{^application/x-www-form-urlencoded}, %r{^multipart/form-data}
@@ -86,29 +86,6 @@ module Rack
       else
         true
       end
-    end
-
-    def create_tempfile
-      tempfile = Tempfile.new('raw-upload.', @tmpdir)
-
-      # If the GC runs, it may unlink the tempfile.
-      # To avoid this, I create another version of it
-      # (a hard link to the same file). If the original
-      # is unlinked, we'll still have this other link.
-      ret = relink_file(tempfile)
-      tempfile.close
-      ret
-    end
-
-    def relink_file(file)
-      new_name = file.path + random_string
-      ::File.link(file.path, new_name)
-      ret = ::File.open(new_name, "r+")
-      ret.binmode
-      ret
-    rescue SystemCallError
-      # The randomly chosen file name was taken. Try again.
-      retry
     end
 
     def random_string

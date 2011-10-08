@@ -30,12 +30,10 @@ module Rack
 
     def convert_and_pass_on(env)
       if env['rack.input'].kind_of?(Tempfile)
-        puts 'EqlFix'
         env['rack.input'].extend(EqlFix)
         tempfile = env['rack.input']
       else
-        puts 'NO EqlFix'
-        tempfile = create_tempfile
+        tempfile = Tempfile.new('raw-upload.', @tmpdir)
         tempfile << env['rack.input'].read
         tempfile.flush
         tempfile.rewind
@@ -88,31 +86,6 @@ module Rack
       else
         true
       end
-    end
-
-    def create_tempfile
-      tempfile = Tempfile.new('raw-upload.', @tmpdir)
-
-      # If the GC runs, it may unlink the tempfile.
-      # To avoid this, I create another version of it
-      # (a hard link to the same file). If the original
-      # is unlinked, we'll still have this other link.
-      ret = relink_file(tempfile)
-      tempfile.close
-      ret
-    end
-
-    def relink_file(file)
-      new_name = file.path + random_string
-      ::File.link(file.path, new_name)
-      ret = ::File.open(new_name, "r+")
-require 'pp'
-pp ret.methods.sort
-      ret.binmode
-      ret
-    rescue SystemCallError
-      # The randomly chosen file name was taken. Try again.
-      retry
     end
 
     def random_string

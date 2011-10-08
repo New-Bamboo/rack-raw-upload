@@ -98,11 +98,29 @@ class RawUploadTest < Test::Unit::TestCase
       assert_successful_non_upload
     end
 
-    should "ensure the uploaded file exists after garbage collection (Ruby 1.9)" do
-      upload
-      received = last_request.POST["file"]
-      GC.start
-      assert File.exists?(received[:tempfile].path)
+    context "when garbage collection runs (Ruby 1.9)" do
+      context "and the file is received as a Tempfile" do
+        should "ensure that the uploaded file remains" do
+          tempfile = Tempfile.new('rack-raw-upload-test-')
+          tempfile << @file.read
+          tempfile.rewind
+          upload('rack.input' => tempfile)
+          received = last_request.POST["file"]
+          GC.start
+          assert File.exists?(received[:tempfile].path)
+          assert_file_uploaded
+        end
+      end
+
+      context "and the file is NOT received as a TmpFile" do
+        should "ensure that the uploaded file remains" do
+          upload
+          received = last_request.POST["file"]
+          GC.start
+          assert File.exists?(received[:tempfile].path)
+          assert_file_uploaded
+        end
+      end
     end
 
     context "with X-File-Upload: smart" do

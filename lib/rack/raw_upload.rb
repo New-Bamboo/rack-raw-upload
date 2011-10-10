@@ -34,7 +34,9 @@ module Rack
         tempfile = env['rack.input']
       else
         tempfile = Tempfile.new('raw-upload.', @tmpdir)
-        tempfile << env['rack.input'].read
+        env['rack.input'].each do |chunk|                   # Fixes Encoding::UndefinedConversionError
+          tempfile << chunk.force_encoding('UTF-8')
+        end
         tempfile.flush
         tempfile.rewind
       end

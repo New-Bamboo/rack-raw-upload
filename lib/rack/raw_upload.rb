@@ -34,7 +34,16 @@ module Rack
         tempfile = env['rack.input']
       else
         tempfile = Tempfile.new('raw-upload.', @tmpdir)
-        tempfile << env['rack.input'].read
+
+        # Can't get to produce a test case for this :-(
+        env['rack.input'].each do |chunk|
+          if chunk.respond_to?(:force_encoding)
+            tempfile << chunk.force_encoding('UTF-8')
+          else
+            tempfile << chunk
+          end
+        end
+
         tempfile.flush
         tempfile.rewind
       end

@@ -20,7 +20,7 @@ class RawUploadTest < Test::Unit::TestCase
     @middleware_opts = {}
     @path = File.join(File.dirname(__FILE__), %w{data me-in-shanghai.jpg})
     @filename = File.basename(@path)
-    @file = File.open(@path)
+    @file = File.open(@path) # Maybe use mode 'rb:ASCII-8BIT'? May help with the pending test below. Not doing it for the moment, as it's not supported by Rubinius
   end
 
   def upload(env = {})
@@ -87,7 +87,16 @@ class RawUploadTest < Test::Unit::TestCase
       upload('rack.input' => tempfile)
       assert_file_uploaded
     end
-    
+
+    # Sould be something like this, but I can't get this to fail
+    # when it should. Instead, I'm testing using the example
+    # undefined_conversion_error app for the time being.
+    # should "work when the input is a StringIO" do
+    #   rack_input = StringIO.new(@file.read)
+    #   upload('rack.input' => rack_input)
+    #   assert_file_uploaded
+    # end
+
     should "be forced to perform a file upload if `X-File-Upload: true`" do
       upload('CONTENT_TYPE' => 'multipart/form-data', 'HTTP_X_FILE_UPLOAD' => 'true')
       assert_file_uploaded_as 'multipart/form-data'
@@ -198,7 +207,7 @@ class RawUploadTest < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "path matcher" do
     should "accept any path by default" do
       rru = Rack::RawUpload.new(nil)
@@ -221,7 +230,7 @@ class RawUploadTest < Test::Unit::TestCase
       assert ! rru.upload_path?('/resourcess.json')
       assert ! rru.upload_path?('/resources.json/blah')
     end
-    
+
     should "accept several entries" do
       rru = Rack::RawUpload.new nil, :paths => ['/resources.*', '/uploads']
       assert rru.upload_path?('/uploads')
@@ -236,7 +245,7 @@ class RawUploadTest < Test::Unit::TestCase
     assert_files_equal file, received[:tempfile]
     assert last_response.ok?
   end
-  
+
   def assert_file_uploaded_as(file_type)
     file = File.open(@path)
     received = last_request.POST["file"]

@@ -1,21 +1,17 @@
 # Rack Raw Upload middleware
 
-Rack::RawUpload converts raw file uploads into normal form input, so Rack applications can read these as normal (using `params` for example), rather than from `env['rack.input']` or similar.
+Rack::RawUpload converts raw uploads into normal multipart requests, like those in a form. Rack applications can then read these as normal (using `params` for example), rather than from `env['rack.input']` or similar.
 
-Rack::RawUpload know that a request is such an upload when the mimetype **is not** one of the following:
-
-* application/x-www-form-urlencoded
-* multipart/form-data
-
-Additionally, it can be told explicitly to perform the conversion, using the header `X-File-Upload`. See below for details.
+Rack::RawUpload processes a request this way when the mimetype **is not** one of the following:
 
 ## Assumptions
 
-Rack::RawUpload expects that requests will:
+Rack::RawUpload performs this conversion when two conditions are met:
 
-1. be POST or PUT requests
-2. set the mimetype `application/octet-stream`
-
+1. The request method is POST or PUT
+2. The mimetype is one of
+    * application/x-www-form-urlencoded
+    * multipart/form-data
 
 ## Configuration
 
@@ -45,24 +41,24 @@ and then add the middleware in application.rb
 
     config.middleware.use 'Rack::RawUpload'
 
-## More options
 
-### Specifying the file name of the upload
+## Usage
 
-Raw uploads, due to their own nature, don't include the name of the file being uploaded. You can work around this limitation by specifying the filename as an HTTP header.
+The upload is made into a request argument called `file`. In several popular frameworks, this can be accessed as `params[:file]`. This includes Rails and Sinatra, but may be different in other frameworks.
 
-When present, Rack::RawUpload will assume that the header ***`X-File-Name`*** will contain the filename.
 
-### Additional query parameters
+## Optional request headers
 
-Again, the nature of raw uploads prevents us from sending additional parameters along with the file. As a workaround, you can specify there as a header too. They will be made available as normal parameters.
+Raw uploads, due to their own nature, can't provide additional arguments in the request. This limitation can be worked around using headers.
 
-When present, Rack::RawUpload will assume that the header ***`X-Query-Params`*** contains these additional parameters. The values are expected to be in the form of a **JSON** hash.
+* `X-File-Name`: specify the name of the uploaded file.
+* `X-Query-Params`: JSON-formatted hash containing additional arguments. On Rails or Sinatra, you can read these as `params[:name_of_argument]`
+
 
 ## Additional info
 
-A blog post on HTML5 uploads, which are raw uploads, and can be greatly simplified with this middleware:
+A blog post on Ajax uploads. These are raw uploads and can be greatly simplified with this middleware:
 
 * [http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads](http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads)
 
-This middleware should work with Ruby 1.8.7, 1.9.2, REE, Rubinius and JRuby. Tests for all these platforms are run on the wonderful [Travis-CI](http://travis-ci.org/) regularly, and the current status of these is: [![Build Status](http://travis-ci.org/newbamboo/rack-raw-upload.png)](http://travis-ci.org/newbamboo/rack-raw-upload)
+This middleware should work with Ruby 1.8.7, 1.9.2, 1.9.3, REE, Rubinius and JRuby. Tests for all these platforms are run on the wonderful [Travis-CI](http://travis-ci.org/) regularly, and the current status of these is: [![Build Status](http://travis-ci.org/newbamboo/rack-raw-upload.png)](http://travis-ci.org/newbamboo/rack-raw-upload)

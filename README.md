@@ -6,12 +6,13 @@ Rack::RawUpload processes a request this way when the mimetype **is not** one of
 
 ## Assumptions
 
-Rack::RawUpload performs this conversion when two conditions are met:
+Rack::RawUpload performs this conversion when all these conditions are met:
 
 1. The request method is POST or PUT
 2. The mimetype is one of
     * application/x-www-form-urlencoded
     * multipart/form-data
+3. The request includes body data
 
 ## Configuration
 

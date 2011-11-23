@@ -73,6 +73,11 @@ class RawUploadTest < Test::Unit::TestCase
       assert_successful_non_upload
     end
 
+    should "not work when there is no input" do
+      upload('rack.input' => '')
+      assert_successful_non_upload
+    end
+
     # "stuff" should be something like "boundary=----WebKitFormBoundaryeKPeU4p65YgercgO",
     # but if I do that here, Rack tries to be clever and the test breaks
     should "not work with Content-Type 'multipart/form-data; stuff'" do

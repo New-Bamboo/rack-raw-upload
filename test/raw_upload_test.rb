@@ -26,7 +26,7 @@ class RawUploadTest < Test::Unit::TestCase
   def upload(env = {})
     env = {
       'CONTENT_TYPE' => 'application/octet-stream',
-      'rack.input' => @file
+      'rack.input' => @file,
     }.merge(env)
     do_request(env)
   end
@@ -34,15 +34,18 @@ class RawUploadTest < Test::Unit::TestCase
   def post(env = {})
     env = {
       'CONTENT_TYPE' => 'multipart/form-data',
-      'rack.input' => StringIO.new('things=stuff')
+      'rack.input' => StringIO.new('things=stuff'),
     }.merge(env)
     do_request(env)
   end
 
   def do_request(env = {})
+    input = env['rack.input']
+    length = input.respond_to?(:size) ? input.size : File.size(input.path)
     env = {
       'REQUEST_METHOD' => 'POST',
       'PATH_INFO' => '/some/path',
+      'CONTENT_LENGTH' => length.to_s,
     }.merge(env)
     request(env['PATH_INFO'], env)
   end
@@ -75,6 +78,11 @@ class RawUploadTest < Test::Unit::TestCase
 
     should "not work when there is no input" do
       upload('rack.input' => '')
+      assert_successful_non_upload
+    end
+
+    should "not work when there is no input" do
+      upload('rack.input' => StringIO.new(''))
       assert_successful_non_upload
     end
 

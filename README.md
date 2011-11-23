@@ -12,7 +12,7 @@ Rack::RawUpload performs this conversion when all these conditions are met:
 2. The mimetype is one of
     * application/x-www-form-urlencoded
     * multipart/form-data
-3. The request includes body data
+3. The Content-Length is greater than 0
 
 ## Configuration
 

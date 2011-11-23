@@ -3,7 +3,7 @@ require 'tmpdir' # Needed in 1.8.7 to access Dir::tmpdir
 module Rack
   class RawUpload
 
-    VERSION = '1.0.10'
+    VERSION = '1.0.11'
 
     def initialize(app, opts = {})
       @app = app
@@ -76,7 +76,7 @@ module Rack
       upload_path?(env['PATH_INFO']) &&
         %{POST PUT}.include?(env['REQUEST_METHOD']) &&
         content_type_of_raw_file?(env['CONTENT_TYPE']) &&
-        input_is_present?(env['rack.input'])
+        env['CONTENT_LENGTH'].to_i > 0
     end
 
     def literal_path_match?(request_path, candidate)
@@ -96,10 +96,6 @@ module Rack
       else
         true
       end
-    end
-
-    def input_is_present?(input)
-      !input.nil? && (!input.respond_to?(:empty?) || !input.empty?)
     end
 
     def random_string

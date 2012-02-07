@@ -2,12 +2,10 @@ require 'rubygems'
 require 'rack/test'
 require 'shoulda'
 require 'rack-raw-upload'
-require 'json'
 require 'digest'
 
 class RawUploadTest < Test::Unit::TestCase
   include Rack::Test::Methods
-
   def app
     opts = @middleware_opts
     Rack::Builder.new do
@@ -198,18 +196,25 @@ class RawUploadTest < Test::Unit::TestCase
 
     context "with query parameters" do
       setup do
-        upload('HTTP_X_QUERY_PARAMS' => JSON.generate({
-          :argument => 'value1',
-          'argument with spaces' => 'value 2'
-        }))
+        upload('HTTP_X_QUERY_PARAMS' => 'argument=value1&argument+with+spaces=value+2&nested[attrib]=value+2')
       end
 
       should "convert these into arguments" do
         assert_equal last_request.POST['argument'], 'value1'
-        assert_equal last_request.POST['argument with spaces'], 'value 2'
+        assert_equal last_request.POST['nested']['attrib'], 'value 2'
       end
     end
 
+    context "with filename key " do
+      setup do
+        upload('HTTP_X_FILE_NAME' => @filename, 'HTTP_X_FILE_KEY' => 'post[attachment][asset]')
+      end
+
+      should "be transformed into a normal form upload" do
+        assert_equal @filename, last_request.POST["post"]["attachment"]["asset"][:filename]
+      end
+    end
+    
     context "with filename" do
       setup do
         upload('HTTP_X_FILE_NAME' => @filename)

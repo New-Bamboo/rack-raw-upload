@@ -53,7 +53,8 @@ The upload is made into a request argument called `file`. In several popular fra
 Raw uploads, due to their own nature, can't provide additional arguments in the request. This limitation can be worked around using headers.
 
 * `X-File-Name`: specify the name of the uploaded file.
-* `X-Query-Params`: JSON-formatted hash containing additional arguments. On Rails or Sinatra, you can read these as `params[:name_of_argument]`
+* `X-File-Key`: Query string of specific file field (Allows you to remap files to their correct fields)
+* `X-Query-Params`: Query string of arguments. On Rails or Sinatra, you can read these as `params[:name_of_argument]`
 
 
 ## Additional info

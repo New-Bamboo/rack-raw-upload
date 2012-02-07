@@ -1,6 +1,6 @@
 source :rubygems
 
-gem 'json'
+gem 'addressable'
 
 group :development, :test do
   gem 'rake'

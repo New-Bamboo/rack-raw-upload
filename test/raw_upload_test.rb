@@ -207,11 +207,11 @@ class RawUploadTest < Test::Unit::TestCase
 
     context "with filename key " do
       setup do
-        upload('HTTP_X_FILE_NAME' => @filename, 'HTTP_X_FILE_KEY' => 'post[attachement]')
+        upload('HTTP_X_FILE_NAME' => @filename, 'HTTP_X_FILE_KEY' => 'post[attachment][asset]')
       end
 
       should "be transformed into a normal form upload" do
-        assert_equal @filename, last_request.POST["post"]["attachement"][:filename]
+        assert_equal @filename, last_request.POST["post"]["attachment"]["asset"][:filename]
       end
     end
     

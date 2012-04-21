@@ -2,16 +2,14 @@
 
 Rack::RawUpload converts raw uploads into normal multipart requests, like those in a form. Rack applications can then read these as normal (using `params` for example), rather than from `env['rack.input']` or similar.
 
-Rack::RawUpload processes a request this way when the mimetype **is not** one of the following:
-
 ## Assumptions
 
 Rack::RawUpload performs this conversion when all these conditions are met:
 
 1. The request method is POST or PUT
 2. The mimetype is one of
-    * application/x-www-form-urlencoded
-    * multipart/form-data
+    * `application/x-www-form-urlencoded`
+    * `multipart/form-data`
 3. The Content-Length is greater than 0
 
 ## Configuration

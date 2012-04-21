@@ -60,9 +60,11 @@ module Rack
       if env['HTTP_X_QUERY_PARAMS']
         env['rack.errors'].puts("Warning! The header X-Query-Params is deprecated. Please use X-JSON-Params instead.")
         inject_json_params!(env, env['HTTP_X_QUERY_PARAMS'])
-      elsif env['HTTP_X_JSON_PARAMS']
+      end
+      if env['HTTP_X_JSON_PARAMS']
         inject_json_params!(env, env['HTTP_X_JSON_PARAMS'])
-      elsif env['HTTP_X_PARAMS']
+      end
+      if env['HTTP_X_PARAMS']
         inject_query_params!(env, env['HTTP_X_PARAMS'])
       end
       @app.call(env)

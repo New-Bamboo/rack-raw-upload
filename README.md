@@ -1,3 +1,11 @@
+# WARNING: you may not need this
+
+If you want to use this because you are performing HTML5 file uploads, you may be doing it [the "old way"](http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads).
+
+There is a "new", [better way of doing this](http://blog.new-bamboo.co.uk/2012/01/10/ridiculously-simple-ajax-uploads-with-formdata). It may be a better solution for your problems.
+
+However, if this is not the case, please read on. I hope you find this middleware useful.
+
 # Rack Raw Upload middleware
 
 Rack::RawUpload converts raw uploads into normal multipart requests, like those in a form. Rack applications can then read these as normal (using `params` for example), rather than from `env['rack.input']` or similar.

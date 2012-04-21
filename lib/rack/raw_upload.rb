@@ -57,11 +57,13 @@ module Rack
       env['rack.request.query_hash'] ||= {}
       env['rack.request.form_hash']['file'] = fake_file
       env['rack.request.query_hash']['file'] = fake_file
-      if query_params = env['HTTP_X_QUERY_PARAMS']
-        require 'json'
-        params = JSON.parse(query_params)
-        env['rack.request.form_hash'].merge!(params)
-        env['rack.request.query_hash'].merge!(params)
+      if env['HTTP_X_QUERY_PARAMS']
+        env['rack.errors'].puts("Warning! The header X-Query-Params is deprecated. Please use X-JSON-Params instead.")
+        inject_json_params!(env, env['HTTP_X_QUERY_PARAMS'])
+      elsif env['HTTP_X_JSON_PARAMS']
+        inject_json_params!(env, env['HTTP_X_JSON_PARAMS'])
+      elsif env['HTTP_X_PARAMS']
+        inject_query_params!(env, env['HTTP_X_PARAMS'])
       end
       @app.call(env)
     end
@@ -100,6 +102,19 @@ module Rack
 
     def random_string
       (0...8).map{65.+(rand(25)).chr}.join
+    end
+
+    def inject_json_params!(env, params)
+      require 'json'
+      hsh = JSON.parse(params)
+      env['rack.request.form_hash'].merge!(hsh)
+      env['rack.request.query_hash'].merge!(hsh)
+    end
+
+    def inject_query_params!(env, params)
+      hsh = Rack::Utils.parse_query(params)
+      env['rack.request.form_hash'].merge!(hsh)
+      env['rack.request.query_hash'].merge!(hsh)
     end
   end
 

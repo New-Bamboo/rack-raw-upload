@@ -4,9 +4,11 @@ require 'shoulda'
 require 'rack-raw-upload'
 require 'json'
 require 'digest'
+require 'rr'
 
 class RawUploadTest < Test::Unit::TestCase
   include Rack::Test::Methods
+  include RR::Adapters::TestUnit
 
   def app
     opts = @middleware_opts
@@ -196,9 +198,9 @@ class RawUploadTest < Test::Unit::TestCase
       end
     end
 
-    context "with query parameters" do
+    context "with JSON parameters" do
       setup do
-        upload('HTTP_X_QUERY_PARAMS' => JSON.generate({
+        upload('HTTP_X_JSON_PARAMS' => JSON.generate({
           :argument => 'value1',
           'argument with spaces' => 'value 2'
         }))
@@ -207,6 +209,43 @@ class RawUploadTest < Test::Unit::TestCase
       should "convert these into arguments" do
         assert_equal last_request.POST['argument'], 'value1'
         assert_equal last_request.POST['argument with spaces'], 'value 2'
+      end
+    end
+
+    context "with query parameters" do
+      setup do
+        upload('HTTP_X_PARAMS' => "arg=val1&ar+g=val2")
+      end
+
+      should "convert these into arguments" do
+        assert_equal last_request.POST['arg'], 'val1'
+        assert_equal last_request.POST['ar g'], 'val2'
+      end
+    end
+
+    context "with query parameters, deprecated style" do
+      setup do
+        json_params = JSON.generate({
+          :argument => 'value1',
+          'argument with spaces' => 'value 2'
+        })
+        @mock_error_stream = obj = Object.new
+        stub(obj).puts
+        stub(obj).flush
+
+        upload({
+          'HTTP_X_QUERY_PARAMS' => json_params,
+          'rack.errors' => @mock_error_stream
+        })
+      end
+
+      should "convert these into arguments" do
+        assert_equal last_request.POST['argument'], 'value1'
+        assert_equal last_request.POST['argument with spaces'], 'value 2'
+      end
+
+      should "give a deprecation warning" do
+        assert_received(@mock_error_stream) {|subject| subject.puts(is_a(String)) }
       end
     end
 

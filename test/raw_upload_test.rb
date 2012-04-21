@@ -81,9 +81,7 @@ class RawUploadTest < Test::Unit::TestCase
     should "not work when there is no input" do
       upload('rack.input' => '')
       assert_successful_non_upload
-    end
 
-    should "not work when there is no input" do
       upload('rack.input' => StringIO.new(''))
       assert_successful_non_upload
     end

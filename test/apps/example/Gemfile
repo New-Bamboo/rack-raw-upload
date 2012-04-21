@@ -1,0 +1,4 @@
+source :rubygems
+
+gem 'sinatra'
+gem 'rack-raw-upload', :path => '../../..'

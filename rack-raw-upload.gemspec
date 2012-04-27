@@ -15,9 +15,10 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{lib,test}/**/*.rb"] + spec.extra_rdoc_files + %w{Gemfile Gemfile.lock}
   spec.test_files = spec.files.grep(/^test\/.*test_.*\.rb$/)
 
-  spec.add_runtime_dependency 'json'
+  spec.add_runtime_dependency 'multi_json'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rack-test'
   spec.add_development_dependency 'shoulda'
+  spec.add_development_dependency 'rr'
 end
 

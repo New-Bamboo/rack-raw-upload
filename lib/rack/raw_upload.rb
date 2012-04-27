@@ -1,4 +1,5 @@
 require 'tmpdir' # Needed in 1.8.7 to access Dir::tmpdir
+require 'multi_json'
 
 module Rack
   class RawUpload
@@ -107,8 +108,7 @@ module Rack
     end
 
     def inject_json_params!(env, params)
-      require 'json'
-      hsh = JSON.parse(params)
+      hsh = MultiJson.load(params)
       env['rack.request.form_hash'].merge!(hsh)
       env['rack.request.query_hash'].merge!(hsh)
     end

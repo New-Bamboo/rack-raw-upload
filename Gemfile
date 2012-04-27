@@ -1,6 +1,6 @@
 source :rubygems
 
-gem 'json'
+gem 'multi_json'
 
 group :development, :test do
   gem 'rake'

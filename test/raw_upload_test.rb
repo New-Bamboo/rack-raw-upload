@@ -198,7 +198,7 @@ class RawUploadTest < Test::Unit::TestCase
 
     context "with JSON parameters" do
       setup do
-        upload('HTTP_X_JSON_PARAMS' => JSON.generate({
+        upload('HTTP_X_JSON_PARAMS' => MultiJson.dump({
           :argument => 'value1',
           'argument with spaces' => 'value 2'
         }))
@@ -223,7 +223,7 @@ class RawUploadTest < Test::Unit::TestCase
 
     context "with query parameters, deprecated style" do
       setup do
-        json_params = JSON.generate({
+        json_params = MultiJson.dump({
           :argument => 'value1',
           'argument with spaces' => 'value 2'
         })

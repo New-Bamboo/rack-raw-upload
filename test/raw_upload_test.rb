@@ -2,7 +2,7 @@ require 'rubygems'
 require 'rack/test'
 require 'shoulda'
 require 'rack-raw-upload'
-require 'json'
+require 'multi_json'
 require 'digest'
 require 'rr'
 

@@ -44,6 +44,7 @@ module Rack
             tempfile << chunk
           end
         end
+        env['rack.input'].rewind
 
         tempfile.flush
         tempfile.rewind

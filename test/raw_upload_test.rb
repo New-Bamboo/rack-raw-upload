@@ -120,6 +120,11 @@ class RawUploadTest < Test::Unit::TestCase
       assert_successful_non_upload
     end
 
+    should "leave rack.input in a state readable by other middlewares" do
+      upload
+      assert !last_request.env['rack.input'].eof?, "rack.input should be rewind'd"
+    end
+
     context "when garbage collection runs (Ruby 1.9)" do
       context "and the file is received as a Tempfile" do
         should "ensure that the uploaded file remains" do

@@ -70,8 +70,10 @@ function handleSubmit(evt) {
           return;
       }
 
-      if (status == '200' && evt.target.responseText) {
-        $('#result').html('<p>The server saw it as:</p><pre>' + evt.target.responseText + '</pre>');
+      var body = evt.target.responseText;
+      if (status == '200' && body) {
+        var data = $.parseJSON(body)
+        $('#result').html('<p>The server saw it as:</p><pre>' + data.dump + '</pre><p><a href="' + data.download_url + '">Download the file</a></p>');
       }
   }
 }

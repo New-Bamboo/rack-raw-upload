@@ -4,7 +4,7 @@ require 'multi_json'
 module Rack
   class RawUpload
 
-    VERSION = '1.1.0'
+    VERSION = '1.1.1'
 
     def initialize(app, opts = {})
       @app = app

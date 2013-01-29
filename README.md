@@ -15,7 +15,7 @@ Rack::RawUpload converts raw uploads into normal multipart requests, like those 
 Rack::RawUpload performs this conversion when all these conditions are met:
 
 1. The request method is POST or PUT
-2. The mimetype is one of
+2. The mimetype is NOT one of
     * `application/x-www-form-urlencoded`
     * `multipart/form-data`
 3. The Content-Length is greater than 0

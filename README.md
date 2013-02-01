@@ -71,4 +71,4 @@ A blog post on Ajax uploads. These are raw uploads and can be greatly simplified
 
 * [http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads](http://blog.new-bamboo.co.uk/2010/7/30/html5-powered-ajax-file-uploads)
 
-This middleware should work with Ruby 1.8.7, 1.9.2, 1.9.3, REE, Rubinius and JRuby. Tests for all these platforms are run on the wonderful [Travis-CI](http://travis-ci.org/) regularly, and the current status of these is: [![Build Status](http://travis-ci.org/newbamboo/rack-raw-upload.png)](http://travis-ci.org/newbamboo/rack-raw-upload)
+This middleware should work with Ruby 1.8.7, 1.9.2, 1.9.3, REE, Rubinius and JRuby. Tests for all these platforms are run on the wonderful [Travis-CI](http://travis-ci.org/) regularly, and the current status of these is: [![Build Status](https://api.travis-ci.org/newbamboo/rack-raw-upload.png)](http://travis-ci.org/newbamboo/rack-raw-upload)

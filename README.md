@@ -6,6 +6,10 @@ There is a "new", [better way of doing this](http://blog.new-bamboo.co.uk/2012/0
 
 However, if this is not the case, please read on. I hope you find this middleware useful.
 
+# WARNING: there seem to be problems running this on Windows
+
+I have received reports of this middleware not working properly on Windows environments. Unfortunately, I am not able to fix this. If you encounter such problems and are able to provide a fix with a test case, I'll be delighted to include it in a future version of this software.
+
 # Rack Raw Upload middleware
 
 Rack::RawUpload converts raw uploads into normal multipart requests, like those in a form. Rack applications can then read these as normal (using `params` for example), rather than from `env['rack.input']` or similar.

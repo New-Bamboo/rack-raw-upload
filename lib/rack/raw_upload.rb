@@ -13,6 +13,7 @@ module Rack
       @explicit = opts[:explicit]
       @tmpdir = opts[:tmpdir] || Dir::tmpdir
       @paths = [@paths] if @paths.kind_of?(String)
+      @mime = opts[:mime]
     end
 
     def call(env)

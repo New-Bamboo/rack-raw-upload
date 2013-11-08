@@ -1,5 +1,6 @@
 require 'tmpdir' # Needed in 1.8.7 to access Dir::tmpdir
 require 'multi_json'
+require 'mimemagic'
 
 module Rack
   class RawUpload
@@ -12,6 +13,7 @@ module Rack
       @explicit = opts[:explicit]
       @tmpdir = opts[:tmpdir] || Dir::tmpdir
       @paths = [@paths] if @paths.kind_of?(String)
+      @mime = opts[:mime]
     end
 
     def call(env)
@@ -49,10 +51,15 @@ module Rack
         tempfile.flush
         tempfile.rewind
       end
+
+      if @mime.present?
+        raise SecurityError, 'Wrong mimetype' unless @mime === MimeMagic.by_magic(tempfile).to_s
+      end
+
       fake_file = {
         :filename => env['HTTP_X_FILE_NAME'],
-        :type => env['CONTENT_TYPE'],
-        :tempfile => tempfile,
+        :type => MIME::Types.type_for(env['HTTP_X_FILE_NAME']).first||env['CONTENT_TYPE'],
+        :tempfile => tempfile
       }
       env['rack.request.form_input'] = env['rack.input']
       env['rack.request.form_hash'] ||= {}

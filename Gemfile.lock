@@ -1,19 +1,41 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    multi_json (1.3.2)
-    rack (1.2.1)
-    rack-test (0.5.6)
+    activesupport (4.0.1)
+      i18n (~> 0.6, >= 0.6.4)
+      minitest (~> 4.2)
+      multi_json (~> 1.3)
+      thread_safe (~> 0.1)
+      tzinfo (~> 0.3.37)
+    atomic (1.1.14)
+    atomic (1.1.14-java)
+    i18n (0.6.5)
+    mimemagic (0.2.1)
+    minitest (4.7.5)
+    multi_json (1.8.2)
+    rack (1.5.2)
+    rack-test (0.6.2)
       rack (>= 1.0)
-    rake (0.8.7)
-    rr (1.0.4)
-    shoulda (2.11.3)
+    rake (10.1.0)
+    rr (1.1.2)
+    shoulda (3.5.0)
+      shoulda-context (~> 1.0, >= 1.0.1)
+      shoulda-matchers (>= 1.4.1, < 3.0)
+    shoulda-context (1.1.6)
+    shoulda-matchers (2.4.0)
+      activesupport (>= 3.0.0)
+    thread_safe (0.1.3)
+      atomic
+    thread_safe (0.1.3-java)
+      atomic
+    tzinfo (0.3.38)
 
 PLATFORMS
   java
   ruby
 
 DEPENDENCIES
+  mimemagic
   multi_json
   rack-test
   rake

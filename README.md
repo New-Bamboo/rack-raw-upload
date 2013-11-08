@@ -42,6 +42,10 @@ You can also make it so that the conversion only happens when explicitly require
 
     use Rack::RawUpload, :explicit => true
 
+If you would like to receive only files with image mime-type
+
+    use Rack::RawUpload, :mime => /image/
+
 ### Ruby on Rails
 
 Add this to your Gemfile

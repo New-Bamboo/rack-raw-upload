@@ -51,6 +51,11 @@ module Rack
         tempfile.flush
         tempfile.rewind
       end
+
+      if @mime.present?
+        raise SecurityError, 'Wrong mimetype' unless @mime === MimeMagic.by_magic(tempfile).to_s
+      end
+
       fake_file = {
         :filename => env['HTTP_X_FILE_NAME'],
         :type => env['CONTENT_TYPE'],

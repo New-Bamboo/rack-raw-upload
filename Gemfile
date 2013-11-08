@@ -1,6 +1,7 @@
 source :rubygems
 
 gem 'multi_json'
+gem 'mimemagic'
 
 group :development, :test do
   gem 'rake'

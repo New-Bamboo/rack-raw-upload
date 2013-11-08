@@ -16,9 +16,9 @@ Gem::Specification.new do |spec|
   spec.test_files = spec.files.grep(/^test\/.*test_.*\.rb$/)
 
   spec.add_runtime_dependency 'multi_json'
+  spec.add_runtime_dependency 'mimemagic'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rack-test'
   spec.add_development_dependency 'shoulda'
   spec.add_development_dependency 'rr'
 end
-

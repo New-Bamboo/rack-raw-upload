@@ -1,5 +1,6 @@
 require 'tmpdir' # Needed in 1.8.7 to access Dir::tmpdir
 require 'multi_json'
+require 'mimemagic'
 
 module Rack
   class RawUpload

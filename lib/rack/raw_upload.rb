@@ -58,8 +58,8 @@ module Rack
 
       fake_file = {
         :filename => env['HTTP_X_FILE_NAME'],
-        :type => env['CONTENT_TYPE'],
-        :tempfile => tempfile,
+        :type => MIME::Types.type_for(env['HTTP_X_FILE_NAME']).first||env['CONTENT_TYPE'],
+        :tempfile => tempfile
       }
       env['rack.request.form_input'] = env['rack.input']
       env['rack.request.form_hash'] ||= {}

@@ -8,7 +8,6 @@ require 'rr'
 
 class RawUploadTest < Test::Unit::TestCase
   include Rack::Test::Methods
-  include RR::Adapters::TestUnit
 
   def app
     opts = @middleware_opts

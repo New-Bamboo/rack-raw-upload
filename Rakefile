@@ -19,7 +19,6 @@ namespace :test do
         bash -c 'source ~/.rvm/scripts/rvm;
                  echo "--------- version #{version} ----------\n";
                  rvm #{version};
-                 bundle install 1> /dev/null;
                  rake test'
       BASH
     end

@@ -50,7 +50,7 @@ Add this to your Gemfile
 
 and then add the middleware in application.rb
 
-    config.middleware.use 'Rack::RawUpload'
+    config.middleware.use Rack::RawUpload
 
 
 ## Usage

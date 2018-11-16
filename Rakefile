@@ -11,16 +11,39 @@ Rake::TestTask.new do |t|
   t.verbose = true
 end
 
+SUPPORTED_RUBIES = %w[
+  2.2.10
+  2.3.8
+  2.4.5
+  2.5.3
+  rbx-3.107
+]
+
 namespace :test do
   desc "Run all tests on multiple ruby versions (requires rvm)"
   task :portability do
-    %w[1.8.7 1.9.2 1.9.3 2.0.0 ree rbx jruby].each do |version|
+    SUPPORTED_RUBIES.each do |version|
       system <<-BASH
-        bash -c 'source ~/.rvm/scripts/rvm;
-                 echo "--------- version #{version} ----------\n";
-                 rvm #{version};
-                 rake test'
+        bash -c 'echo "--------- version #{version} ----------\n" &&
+                 asdf local ruby #{version} &&
+                 bundle exec rake test'
       BASH
+    end
+  end
+
+  namespace :portability do
+    desc "Install all Rubies and dependencies"
+    task :install do
+      SUPPORTED_RUBIES.each do |version|
+        command_ran_ok = system <<-BASH
+          bash -c 'echo "--------- version #{version} ----------\n" &&
+                   asdf install ruby #{version} &&
+                   asdf local ruby #{version} &&
+                   gem install bundler &&
+                   bundle'
+        BASH
+        command_ran_ok or break
+      end
     end
   end
 end

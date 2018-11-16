@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'minitest/autorun'
 require 'rack/test'
 require 'shoulda'
 require 'rack-raw-upload'
@@ -6,7 +7,7 @@ require 'multi_json'
 require 'digest'
 require 'rr'
 
-class RawUploadTest < Test::Unit::TestCase
+class RawUploadTest < Minitest::Test
   include Rack::Test::Methods
 
   def app
